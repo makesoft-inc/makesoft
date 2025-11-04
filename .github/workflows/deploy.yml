@@ -18,11 +18,22 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Test SSH Connection
+        run: |
+          echo "Testing SSH connection to ${{ secrets.DEPLOY_HOST }}..."
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o BatchMode=yes ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} echo "SSH connection successful" || (echo "❌ SSH connection failed. Check:" && echo "  1. Server IP/hostname is correct" && echo "  2. Server is publicly accessible on port 22" && echo "  3. Firewall allows SSH from GitHub Actions IPs" && echo "  4. SSH key is correctly configured" && exit 1)
+
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
-          cd ~/makesoft
+          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          set -e
+          echo "🚀 Starting deployment..."
+          cd ~/makesoft || (echo "❌ Directory ~/makesoft not found" && exit 1)
+          echo "📥 Pulling latest code..."
           git pull origin main
-          docker-compose down
-          docker-compose up -d --build
+          echo "🛑 Stopping services..."
+          docker-compose -f docker-compose.yml down
+          echo "🔨 Building and starting services..."
+          docker-compose -f docker-compose.yml up -d --build
+          echo "✅ Deployment complete!"
           EOF
