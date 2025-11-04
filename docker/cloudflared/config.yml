@@ -1,0 +1,17 @@
+origincert: /etc/cloudflared/credentials/cert.pem
+tunnel: ef034f3f-ad26-44ec-bf16-e3131fb09d55
+credentials-file: /etc/cloudflared/credentials/ef034f3f-ad26-44ec-bf16-e3131fb09d55.json
+
+ingress:
+  - hostname: makesoft.io
+    service: http://nginx:80
+  - hostname: auth.makesoft.io
+    service: http://nginx:80
+  - hostname: portal.makesoft.io
+    service: http://nginx:80
+  - hostname: forum.makesoft.io
+    service: http://nginx:80
+  - hostname: api.makesoft.io
+    service: http://nginx:80
+  - service: http_status:404
+

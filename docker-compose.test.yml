@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mongo-test:
+    image: mongo:7
+    container_name: makesoft_mongo_test
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: test
+      MONGO_INITDB_DATABASE: makesoft_test
+    ports:
+      - "27018:27017"
+    networks:
+      - makesoft_test_network
+
+  auth-test:
+    build:
+      context: ./apps/auth
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=test
+      - MONGO_URI=mongodb://mongo-test:27017/makesoft_test
+      - JWT_SECRET=test-secret
+      - JWT_EXPIRES_IN=1h
+      - GOOGLE_CLIENT_ID=test
+      - GOOGLE_CLIENT_SECRET=test
+      - GITHUB_CLIENT_ID=test
+      - GITHUB_CLIENT_SECRET=test
+      - OAUTH_REDIRECT_URI=http://localhost:3001/oauth/callback
+    depends_on:
+      - mongo-test
+    command: npm test
+    networks:
+      - makesoft_test_network
+
+  api-test:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=test
+      - MONGO_URI=mongodb://mongo-test:27017/makesoft_test
+      - JWT_SECRET=test-secret
+    depends_on:
+      - mongo-test
+    command: npm test
+    networks:
+      - makesoft_test_network
+
+networks:
+  makesoft_test_network:
+    driver: bridge
+
