@@ -1,0 +1,12 @@
+---
+description: Define test strategy and CI setup for project
+globs:
+  - ".github/workflows/*.yml"
+alwaysApply: false
+---
+# Testing & CI  
+- Lint code with ESLint + Prettier before commit.  
+- Unit tests under `apps/auth/tests`, `apps/api/tests`.  
+- Integration tests run via `docker-compose -f docker-compose.test.yml up --build`.  
+- GitHub Actions CI job: run lint → run tests → only merge/deploy when passing.  
+- Block merges to `main` if tests fail or lint errors exist.

@@ -1,0 +1,13 @@
+---
+description: Security rules for infrastructure, containers, environment and routing
+globs:
+  - ""
+alwaysApply: true
+---
+# Security Best Practices  
+- Enforce HTTPS via Cloudflare SSL (Full strict).  
+- Avoid running containers as root; use non-root user where possible.  
+- Secrets stored in `.env`, not committed.  
+- Ensure `JWT_SECRET` and other sensitive environment vars are defined.  
+- Do not expose service ports publicly — only via Nginx proxy.  
+- MongoDB binds only to internal Docker network (not host).

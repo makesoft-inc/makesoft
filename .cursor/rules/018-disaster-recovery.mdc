@@ -1,0 +1,48 @@
+---
+description: Backup, restore, and incident recovery strategy for Makesoft.io infrastructure
+globs:
+  - ""
+alwaysApply: false
+version: "1.0.0"
+---
+# Disaster Recovery Rules
+
+## Backup Policy
+- Automate MongoDB backups daily using cron:
+docker exec mongo mongodump --archive=/backups/mongo-$(date +%F).gz --gzip
+
+- Upload backups to remote storage (S3, Backblaze, or Google Cloud Storage) via `rclone`.
+- Keep:
+- 7 daily backups
+- 4 weekly backups
+- 3 monthly backups
+- Verify one backup weekly with a test restore.
+
+## Restore Procedure
+- Restore command example:
+docker exec -i mongo mongorestore --archive=/backups/mongo-YYYY-MM-DD.gz --gzip --drop
+
+- Always restore to a staging environment before production.
+- Document last verified restore timestamp in `/docs/recovery-log.md`.
+
+## Application Recovery
+- Maintain a hot spare image set in Docker Hub or GHCR.
+- Use `docker-compose up -d` with `--no-cache` to redeploy cleanly.
+- Keep all `.env.production` files versioned privately.
+
+## Incident Response
+- Create incident checklist (`/docs/incident-protocol.md`):
+- Identify & isolate problem.
+- Stop affected services.
+- Notify stakeholders.
+- Apply mitigation/fix.
+- Restore data and confirm service uptime.
+- Post-mortem summary within 24 hours.
+- Use Slack/email alerts tied to Prometheus triggers.
+- Run annual recovery drill to ensure readiness.
+
+## Testing
+- Add CI job `test-backups.yml` monthly to validate:
+- Backup file exists
+- Restoration works in isolated container
+- Backup upload integrity hash matches source

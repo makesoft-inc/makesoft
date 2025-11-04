@@ -1,0 +1,18 @@
+---
+description: Automate local development bootstrap: container startup, hosts entries, seeding DB
+globs:
+  - ""
+alwaysApply: false
+---
+# Local Dev Bootstrap  
+- On first run, execute `scripts/install.sh` to setup dependencies.  
+- Use `docker-compose -f docker-compose.dev.yml up -d --build --remove-orphans` for dev mode.  
+- Update `/etc/hosts` (with sudo) adding:  
+127.0.0.1 landing.makesoft.io
+127.0.0.1 auth.makesoft.io
+127.0.0.1 portal.makesoft.io
+127.0.0.1 forum.makesoft.io
+127.0.0.1 api.makesoft.io
+- After containers up, seed MongoDB with `docker exec mongo ./scripts/seed-db.sh`.  
+- Enable code hot-reload mounts in dev mode for frontend/backend.  
+- When switching to prod branch, ensure dev hosts entries are cleaned or disabled.

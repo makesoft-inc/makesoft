@@ -1,0 +1,16 @@
+---
+description: Monitoring, logging and alerting setup for production infrastructure
+globs:
+  - ""
+alwaysApply: false
+---
+# Monitoring & Logging  
+- Install and configure `prometheus` Docker container to scrape metrics from services on internal network.  
+- Install and configure `grafana` Docker container, data source = Prometheus, dashboards for: CPU, memory, container restart count, HTTP error rate.  
+- Configure `fluentd` (or `filebeat`) container to collect Nginx access/error logs and route to centralized log index (e.g., ELK or Loki).  
+- Alert rules:  
+  - If container restart count > 5 in 10 minutes → trigger Slack/Email.  
+  - If HTTP 5xx rate > 1% for >5 minutes → trigger alert.  
+  - If disk usage > 80% on VM → trigger alert.  
+- Store logs & metrics retention for at least 30 days.  
+- Document monitoring setup in `/docs/monitoring.md` with installation steps, dashboard links, alert definitions.

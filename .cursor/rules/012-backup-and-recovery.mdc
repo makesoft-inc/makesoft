@@ -1,0 +1,12 @@
+---
+description: Backup and recovery plan for MongoDB and volume data
+globs:
+  - ""
+alwaysApply: false
+---
+# Backup & Recovery  
+- Schedule MongoDB backups (cron or GitHub Action) to `backups/mongo/YYYYMMDD.gz`.  
+- Store backups off-site (e.g., AWS S3, Google Drive).  
+- Recovery command: `docker exec mongo mongorestore /data/backup`.  
+- Test restore quarterly.  
+- Document backup retention policy, restore steps.

@@ -1,0 +1,93 @@
+---
+description: "Master index and usage guide for all Makesoft.io Cursor rule files"
+globs: [""]
+alwaysApply: true
+version: "1.0.0"
+---
+
+# 🧩 Makesoft.io — Cursor DevOps Rule Suite
+
+This directory defines all **infrastructure, DevOps, and automation rules** for the Makesoft.io production stack.  
+Each `.mdc` file provides executable logic and guidance for Cursor’s AI Agents to manage local and production environments smoothly.
+
+---
+
+## 📁 Directory Index
+
+| ID  | File | Description |
+|-----|------|--------------|
+| 001 | `project-structure.mdc` | Defines folder conventions and naming standards for all apps and services. |
+| 002 | `environment.mdc` | Specifies `.env` file handling, variable naming, and environment segregation. |
+| 003 | `docker-compose-workflow.mdc` | Main container orchestration logic for local and production. |
+| 004 | `nginx-config.mdc` | Reverse proxy setup and routing standards for all subdomains. |
+| 005 | `cloudflared-setup.mdc` | Cloudflare tunnel and DNS configuration workflow. |
+| 006 | `deploy-workflow.mdc` | CI/CD process (GitHub Actions → SSH → Docker restart). |
+| 007 | `auth-service.mdc` | Rules for the authentication microservice (Node + JWT + MongoDB). |
+| 008 | `api-service.mdc` | API routing, controller structure, and RESTful standards. |
+| 009 | `frontend.mdc` | Vite + React + Tailwind conventions, build commands, and component hierarchy. |
+| 010 | `database.mdc` | MongoDB schema, indexing, seeding, and connection pool rules. |
+| 011 | `networking.mdc` | Nginx ↔ Docker ↔ Cloudflared routing policies and internal ports. |
+| 012 | `ci-tests.mdc` | Continuous integration checks, lint/test enforcement, and coverage reporting. |
+| 013 | `local-dev-bootstrap.mdc` | Developer setup instructions (Docker, hosts entries, seeding). |
+| 014 | `monitoring-logging.mdc` | Prometheus, Grafana, and Fluentd configuration for system visibility. |
+| 015 | `performance-tuning.mdc` | Optimization guidelines for CPU, RAM, caching, and builds. |
+| 016 | `cost-optimization.mdc` | Efficiency and billing reduction strategies. |
+| 017 | `security-hardening.mdc` | System and network security, credential hygiene, and scanning. |
+| 018 | `disaster-recovery.mdc` | Backup/restore policy and incident recovery protocol. |
+
+---
+
+## ⚙️ How Cursor Uses These Rules
+
+### 🧠 Rule Priority
+- `alwaysApply: true` → Cursor loads automatically in every context.  
+- `alwaysApply: false` + `globs` → Cursor applies when relevant files are edited (e.g., `docker-compose.yml`).  
+- Number prefixes (`001-...`, `002-...`) define load order for Cursor Agents.
+
+### 🧩 Rule Composition
+Each `.mdc` file includes:
+1. **Front matter metadata** (YAML block) for Cursor’s parser.  
+2. **Actionable checklists or bullet logic** — not essays.  
+3. **Inline code blocks** for direct command generation.  
+4. **Comments and fallback actions** to ensure robust automation.
+
+---
+
+## 🧰 Local Commands Summary
+
+| Task | Command |
+|------|----------|
+| Start local dev | `docker-compose -f docker-compose.dev.yml up -d --build` |
+| Start production | `docker-compose up -d --build` |
+| Test Nginx routes | `sudo nginx -t && sudo systemctl restart nginx` |
+| Check tunnel status | `cloudflared tunnel info makesoft` |
+| Deploy to prod | Push to `main` branch (triggers GitHub Action) |
+
+---
+
+## 🔐 Security & Maintenance
+
+- All secrets live in `.env` files (never commit).  
+- Rotate SSH + Cloudflare tokens quarterly.  
+- Run `npm audit`, `docker scan`, and `ufw status` monthly.  
+- Keep `/docs/` updated with audit results and system metrics.
+
+---
+
+## 🚀 Cursor Agent Workflow Summary
+
+1. **When editing configs** → Loads relevant rules (`docker-compose`, `nginx`, etc.).  
+2. **When committing or deploying** → Applies CI/CD rules and security scans.  
+3. **When developing locally** → Auto-applies `bootstrap`, `monitoring`, and `performance` checks.  
+4. **When debugging** → Cursor references these rules to correct environment or deployment misconfigurations.  
+
+---
+
+✅ **Goal:**  
+Provide Cursor with all operational intelligence to autonomously guide Makesoft.io’s infrastructure from local development → production deployment → monitoring → recovery.
+
+---
+
+📖 **Author:** McKale Jonas  
+🛠 **Maintained By:** Makesoft.io DevOps Automation  
+📅 **Last Updated:** {{ auto-update date }}

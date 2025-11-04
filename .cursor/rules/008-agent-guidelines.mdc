@@ -1,0 +1,13 @@
+---
+description: Guidelines for Cursor agent behaviour in this project
+globs:
+  - ""
+alwaysApply: true
+---
+# Cursor Agent Behaviour  
+- Treat each service as independent micro-service.  
+- Use Docker Compose commands for orchestration (not manual `docker run`).  
+- On code/architecture edits, recommend `docker-compose up -d --build`.  
+- Use `sudo` for Nginx and cloudflared operations.  
+- On commit to `main`, trigger GitHub Actions deploy.  
+- Maintain `/CHANGELOG.md`: each update includes service, version bump, date.

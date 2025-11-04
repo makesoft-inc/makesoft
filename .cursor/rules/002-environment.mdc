@@ -1,0 +1,19 @@
+---
+description: Manage environment variables and .env template for all services
+globs:
+  - ""
+alwaysApply: true
+---
+# Environment Variables  
+- Auto-generate `.env.example` with at least:  
+MONGO_URI=
+JWT_SECRET=
+TUNNEL_ID=
+DOMAIN_BASE=makesoft.io
+- Map each service’s port & subdomain:  
+AUTH_PORT=3001
+PORTAL_PORT=5174
+FORUM_PORT=3002
+API_PORT=4000
+- Validate required vars presence at startup.  
+- Never log secrets (JWT_SECRET etc.) publicly.

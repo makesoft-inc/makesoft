@@ -1,0 +1,14 @@
+---
+description: Standards for project documentation generation and structure
+globs:
+  - ""
+alwaysApply: false
+---
+# Documentation Standards  
+- Root `README.md` must include:  
+  - Project overview  
+  - Tech stack: Vite/React/TS, Node/Express, MongoDB, Docker Compose  
+  - Deployment instructions  
+- Each service under `apps/` has own `README.md` with port, subdomain, dependencies.  
+- Use `/docs/` folder for architecture diagrams and infra overview.  
+- Use clean Markdown with code-blocks where needed.

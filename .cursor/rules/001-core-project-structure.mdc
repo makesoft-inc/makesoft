@@ -1,0 +1,16 @@
+---
+description: Define project folder structure and service mapping for Makesoft.io
+globs:
+  - ""
+alwaysApply: true
+---
+# Project Structure  
+- Root directory: `root/`  
+- `apps/landing/` → Vite + React + TS + Tailwind (port 5173)  
+- `apps/auth/` → Node.js + Express (port 3001)  
+- `apps/portal/` → Vite + React + TS + Tailwind (port 5174)  
+- `apps/forum/` → Node.js + Express (port 3002)  
+- `apps/api/` → Node.js + Express (port 4000)  
+- `nginx/makesoft.conf` → Nginx reverse proxy  
+- `docker-compose.yml` controls all services including MongoDB container  
+- `.env` & `docker/` sub-folders for infra

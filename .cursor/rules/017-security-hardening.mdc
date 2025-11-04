@@ -1,0 +1,44 @@
+---
+description: Security best practices and hardening rules for Makesoft.io infrastructure
+globs:
+  - ""
+alwaysApply: true
+version: "1.0.0"
+---
+# Security Hardening Rules
+
+## General
+- All environment variables containing secrets (API keys, DB URIs, JWT secrets) must be defined in `.env` and never committed.
+- Add `.env`, `.env.*`, `/keys/`, `/certs/` to `.gitignore`.
+- Run `npm audit` and `docker scan` monthly; resolve critical vulnerabilities immediately.
+- Enforce HTTPS for all domains (Cloudflare Full Strict mode required).
+- Cloudflare firewall: block all non-HTTPS ports, enable WAF.
+- Rotate API keys and SSH credentials every 90 days.
+
+## Server & Network
+- Use `ufw` (Uncomplicated Firewall) on the Ubuntu VM:
+sudo ufw allow OpenSSH
+sudo ufw allow 80,443/tcp
+sudo ufw enable
+
+- Disable password authentication in `/etc/ssh/sshd_config` → `PasswordAuthentication no`.
+- Use SSH keys only; restrict sudo access to deployment user.
+- Configure automatic security updates (`unattended-upgrades`).
+
+## Docker & Nginx
+- Do not run containers as root. Use `user: node` or `user: www-data`.
+- Mount volumes read-only where possible.
+- Restrict Nginx proxy to internal network for service-to-service calls.
+- Add rate limiting:
+limit_req_zone $binary_remote_addr zone=login:10m rate=10r/m;
+limit_req zone=login burst=20 nodelay;
+
+## Cloudflare & Auth
+- Enable “Bot Fight Mode” and “Under Attack” mode during incidents.
+- Use Cloudflare Access for admin routes if applicable.
+- Store hashed passwords with bcrypt ≥ 12 rounds.
+- Require MFA for all admin and GitHub accounts.
+
+## Validation
+- Run OWASP ZAP scan on staging monthly.
+- Maintain `/docs/security-audit.md` with checklist and mitigation tracking.

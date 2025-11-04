@@ -1,0 +1,31 @@
+---
+description: Cost optimization and resource efficiency for Makesoft infrastructure
+globs:
+  - ""
+alwaysApply: false
+version: "1.0.0"
+---
+# Cost Optimization Rules
+
+## Compute Efficiency
+- Monitor Docker container resource usage weekly with `docker stats`.
+- Identify underutilized containers and lower CPU/RAM limits in `docker-compose.yml`.
+- Use lightweight base images:
+  - Prefer `node:20-alpine` over full `node:20`.
+  - Use `nginx:alpine` for reverse proxy.
+- Schedule nightly `docker system prune -af --volumes` to clear unused images/volumes.
+
+## Storage & Database
+- Enable MongoDB TTL indexes for temporary collections (sessions, logs).
+- Backup retention: keep 7 daily + 4 weekly snapshots.
+- Compress backups using `gzip` or `zstd` before upload.
+
+## CI/CD & Networking
+- Use `actions/cache@v4` in GitHub Actions to cache dependencies between builds.
+- Deploy only changed services (use `docker-compose up -d <service>` when possible).
+- Auto-pause Cloudflared connectors during low-traffic hours (optional cron).
+- Enable Cloudflare tiered caching to reduce bandwidth.
+
+## Monitoring & Reports
+- Add a weekly GitHub Action job `analyze-cost.yml` to gather metrics and push a summary to Slack/Email.
+- Keep cost reports under `/reports/costs/YYYY-MM.md` for historical tracking.

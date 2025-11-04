@@ -1,0 +1,18 @@
+---
+description: Workflow for Docker Compose orchestration of all services
+globs:
+  - "docker-compose.yml"
+alwaysApply: true
+---
+# Docker Compose Workflow  
+- Use command: `docker-compose up -d --build --remove-orphans`  
+- Service mapping:  
+landing → 5173
+auth → 3001
+portal → 5174
+forum → 3002
+api → 4000
+mongo → 27017 (internal)
+- Apply `restart: always` for production services.  
+- Backend services depend on mongo.  
+- In dev: mount code for hot reload.

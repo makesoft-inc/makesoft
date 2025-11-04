@@ -1,0 +1,14 @@
+---
+description: Version control strategy including branching and releases
+globs:
+  - ""
+alwaysApply: false
+---
+# Versioning & Branching Strategy  
+- Branching model:  
+  - `main` → production  
+  - `dev` → staging  
+  - `feature/<name>` → feature branches  
+- Semantic versioning: `vMAJOR.MINOR.PATCH`  
+- On merge to `main`, tag release: `git tag -a vX.Y.Z -m "Release vX.Y.Z"`  
+- Update `/CHANGELOG.md` with service, version, date.

@@ -1,0 +1,13 @@
+---
+description: Setup and verify Cloudflared tunnel with Cloudflare DNS routing
+globs:
+  - ""
+alwaysApply: true
+---
+# Cloudflared Tunnel Setup  
+- Verify tunnel info: `cloudflared tunnel info makesoft`  
+- DNS mapping:  
+@, auth, portal, forum, api → <TUNNEL_ID>.cfargotunnel.com
+- SSL/TLS mode: Full (strict) in Cloudflare dashboard.  
+- Monitor cloudflared connection; auto-restart if dropped.  
+- Traffic flow: Cloudflare → Cloudflared → Nginx → Docker containers.

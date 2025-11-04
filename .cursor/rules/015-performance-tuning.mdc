@@ -1,0 +1,33 @@
+---
+description: Performance tuning and optimization for Makesoft production stack
+globs:
+  - ""
+alwaysApply: false
+version: "1.0.0"
+---
+# Performance Tuning Rules
+
+## Server & Container Optimization
+- Use `--memory` and `--cpus` limits in `docker-compose.yml` for each container:
+  - MongoDB: 2 GB RAM max
+  - API: 1 CPU core max
+  - Frontend: 512 MB RAM max
+- Set Nginx caching headers:
+  - Static assets (`.js`, `.css`, `.png`, `.svg`) → cache 7 days.
+  - API routes → no-cache.
+- Enable gzip compression for all static responses.
+- Ensure Nginx `worker_processes auto;` and `worker_connections 4096;`.
+- Enable MongoDB indexes on frequent query fields (user ID, email, timestamps).
+- Use `pm2` or built-in Node.js cluster mode for backend services in non-Docker dev environments.
+- Use Vite build optimizations: `vite build --minify=terser` with code splitting.
+
+## Frontend Performance
+- Lazy-load large components (portal, forum threads).
+- Use `React.memo` for pure functional components.
+- Load analytics scripts asynchronously.
+- Lighthouse score target ≥ 95 for desktop and mobile.
+
+## Network & Cloudflared
+- Cloudflared tunnels: enable HTTP/2, disable unnecessary origin checks.
+- Add CDN cache rules in Cloudflare for static content.
+- Test response time with `curl -w` and ensure < 200 ms TTFB.

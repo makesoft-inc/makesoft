@@ -1,0 +1,16 @@
+---
+description: Nginx reverse proxy configuration for subdomains
+globs:
+  - "nginx/*.conf"
+alwaysApply: true
+---
+# Nginx Configuration  
+- Each `server` block must specify:  
+server_name <subdomain>.makesoft.io;
+location / {
+proxy_pass http://localhost:<service_port>;
+include proxy_params;
+}
+- Redirect HTTP (port 80) → HTTPS (port 443).  
+- Validate config: `sudo nginx -t`  
+- Reload after change: `sudo systemctl restart nginx`
