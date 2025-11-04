@@ -2,51 +2,19 @@ name: Deploy to Production
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: self-hosted   # 👈 uses your VM runner, not GitHub cloud
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Validate docker-compose config
+      - name: Deploy app
         run: |
-          echo "📋 Validating docker-compose configuration..."
-          docker-compose -f docker-compose.yml config > /dev/null
-          echo "✅ Configuration is valid"
-
-      - name: Pull latest code
-        run: |
-          echo "📥 Pulling latest code..."
-          git pull origin main || echo "⚠️  Already up to date"
-
-      - name: Stop existing services
-        run: |
-          echo "🛑 Stopping existing services..."
-          docker-compose -f docker-compose.yml down || true
-
-      - name: Build and start services
-        run: |
-          echo "🔨 Building and starting services..."
-          docker-compose -f docker-compose.yml up -d --build
-
-      - name: Wait for services to be healthy
-        run: |
-          echo "⏳ Waiting for services to be healthy..."
-          sleep 10
-
-      - name: Check service status
-        run: |
-          echo "🏥 Checking service status..."
-          docker-compose -f docker-compose.yml ps
-
-      - name: Deployment complete
-        run: |
-          echo "✅ Deployment complete!"
-          echo ""
-          echo "To view logs: docker-compose -f docker-compose.yml logs -f"
-          echo "To check status: docker-compose -f docker-compose.yml ps"
+          cd ~/makesoft
+          git pull origin main
+          docker-compose down
+          docker-compose up -d --build
