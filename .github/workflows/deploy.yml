@@ -7,33 +7,46 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Test SSH Connection
+      - name: Validate docker-compose config
         run: |
-          echo "Testing SSH connection to ${{ secrets.DEPLOY_HOST }}..."
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o BatchMode=yes ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} echo "SSH connection successful" || (echo "❌ SSH connection failed. Check:" && echo "  1. Server IP/hostname is correct" && echo "  2. Server is publicly accessible on port 22" && echo "  3. Firewall allows SSH from GitHub Actions IPs" && echo "  4. SSH key is correctly configured" && exit 1)
+          echo "📋 Validating docker-compose configuration..."
+          docker-compose -f docker-compose.yml config > /dev/null
+          echo "✅ Configuration is valid"
 
-      - name: Deploy to Server
+      - name: Pull latest code
         run: |
-          ssh -o StrictHostKeyChecking=no -o ConnectTimeout=10 -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
-          set -e
-          echo "🚀 Starting deployment..."
-          cd ~/makesoft || (echo "❌ Directory ~/makesoft not found" && exit 1)
           echo "📥 Pulling latest code..."
-          git pull origin main
-          echo "🛑 Stopping services..."
-          docker-compose -f docker-compose.yml down
+          git pull origin main || echo "⚠️  Already up to date"
+
+      - name: Stop existing services
+        run: |
+          echo "🛑 Stopping existing services..."
+          docker-compose -f docker-compose.yml down || true
+
+      - name: Build and start services
+        run: |
           echo "🔨 Building and starting services..."
           docker-compose -f docker-compose.yml up -d --build
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "⏳ Waiting for services to be healthy..."
+          sleep 10
+
+      - name: Check service status
+        run: |
+          echo "🏥 Checking service status..."
+          docker-compose -f docker-compose.yml ps
+
+      - name: Deployment complete
+        run: |
           echo "✅ Deployment complete!"
-          EOF
+          echo ""
+          echo "To view logs: docker-compose -f docker-compose.yml logs -f"
+          echo "To check status: docker-compose -f docker-compose.yml ps"

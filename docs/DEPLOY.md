@@ -79,57 +79,39 @@ docker-compose up -d --build
 
 ## CI/CD Setup (GitHub Actions)
 
-The repository includes GitHub Actions workflow that auto-deploys on push to `main`.
+The repository includes GitHub Actions workflow that auto-deploys on push to `main` using a **self-hosted runner**.
 
-### Required GitHub Secrets
+### Self-Hosted Runner Setup
 
-Add these secrets in GitHub repository settings:
+**Recommended Approach**: Use a self-hosted runner on your server to avoid network connectivity issues.
 
-- `SSH_PRIVATE_KEY` - SSH private key for server access (the private key matching the public key on the server)
-- `DEPLOY_USER` - SSH username (e.g., `ubuntu`, `dev`)
-- `DEPLOY_HOST` - Server IP address or domain (must be publicly accessible)
+See [SELF_HOSTED_RUNNER.md](./SELF_HOSTED_RUNNER.md) for detailed setup instructions.
 
-### Server Requirements for GitHub Actions
+Quick setup:
+```bash
+mkdir actions-runner && cd actions-runner
+curl -o actions-runner-linux-x64-2.329.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.329.0/actions-runner-linux-x64-2.329.0.tar.gz
+tar xzf ./actions-runner-linux-x64-2.329.0.tar.gz
+./config.sh --url https://github.com/makesoft-inc/makesoft --token YOUR_TOKEN
+sudo ./svc.sh install
+sudo ./svc.sh start
+```
 
-**IMPORTANT**: Your server must be accessible from the internet for GitHub Actions to deploy:
+### Alternative: SSH-Based Deployment
 
-1. **Public IP Address**: The server must have a public IP address (not a private IP like 192.168.x.x or 10.x.x.x)
+If you prefer SSH-based deployment (not recommended if behind firewall):
 
-2. **SSH Port Open**: Port 22 must be open and accessible from GitHub Actions runners:
-   ```bash
-   # On the server, check firewall
-   sudo ufw status
-   sudo ufw allow 22/tcp
-   ```
+1. **Required GitHub Secrets**:
+   - `SSH_PRIVATE_KEY` - SSH private key for server access
+   - `DEPLOY_USER` - SSH username (e.g., `ubuntu`, `dev`)
+   - `DEPLOY_HOST` - Server IP address or domain (must be publicly accessible)
 
-3. **Firewall Configuration**: Allow SSH from GitHub Actions IP ranges (check https://api.github.com/meta for latest IPs)
+2. **Server Requirements**:
+   - Server must have a public IP address
+   - Port 22 must be open and accessible
+   - Firewall must allow SSH from GitHub Actions IPs
 
-4. **SSH Key Setup**: Ensure the public key matching `SSH_PRIVATE_KEY` is in the server's `~/.ssh/authorized_keys`
-
-### Troubleshooting "Network is unreachable" Error
-
-If you see `ssh: connect to host *** port 22: Network is unreachable`:
-
-1. **Check Server Accessibility**:
-   ```bash
-   # From your local machine, test if server is reachable
-   ping YOUR_SERVER_IP
-   ssh -v YOUR_USER@YOUR_SERVER_IP
-   ```
-
-2. **Verify DEPLOY_HOST Secret**: 
-   - Make sure `DEPLOY_HOST` in GitHub Secrets is the **public IP** or domain
-   - Not a private IP or `localhost`
-
-3. **Check Server Firewall**:
-   ```bash
-   # On the server
-   sudo ufw status
-   sudo ufw allow 22/tcp
-   ```
-
-4. **Alternative: Use Self-Hosted Runner**:
-   If your server is behind a firewall, consider using a GitHub Actions self-hosted runner on the server instead of SSH deployment.
+See troubleshooting section below for SSH deployment issues.
 
 ### Deployment Flow
 
