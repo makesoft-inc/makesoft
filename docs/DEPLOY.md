@@ -85,16 +85,59 @@ The repository includes GitHub Actions workflow that auto-deploys on push to `ma
 
 Add these secrets in GitHub repository settings:
 
-- `SSH_PRIVATE_KEY` - SSH private key for server access
-- `DEPLOY_USER` - SSH username (e.g., `ubuntu`)
-- `DEPLOY_HOST` - Server IP or domain
+- `SSH_PRIVATE_KEY` - SSH private key for server access (the private key matching the public key on the server)
+- `DEPLOY_USER` - SSH username (e.g., `ubuntu`, `dev`)
+- `DEPLOY_HOST` - Server IP address or domain (must be publicly accessible)
+
+### Server Requirements for GitHub Actions
+
+**IMPORTANT**: Your server must be accessible from the internet for GitHub Actions to deploy:
+
+1. **Public IP Address**: The server must have a public IP address (not a private IP like 192.168.x.x or 10.x.x.x)
+
+2. **SSH Port Open**: Port 22 must be open and accessible from GitHub Actions runners:
+   ```bash
+   # On the server, check firewall
+   sudo ufw status
+   sudo ufw allow 22/tcp
+   ```
+
+3. **Firewall Configuration**: Allow SSH from GitHub Actions IP ranges (check https://api.github.com/meta for latest IPs)
+
+4. **SSH Key Setup**: Ensure the public key matching `SSH_PRIVATE_KEY` is in the server's `~/.ssh/authorized_keys`
+
+### Troubleshooting "Network is unreachable" Error
+
+If you see `ssh: connect to host *** port 22: Network is unreachable`:
+
+1. **Check Server Accessibility**:
+   ```bash
+   # From your local machine, test if server is reachable
+   ping YOUR_SERVER_IP
+   ssh -v YOUR_USER@YOUR_SERVER_IP
+   ```
+
+2. **Verify DEPLOY_HOST Secret**: 
+   - Make sure `DEPLOY_HOST` in GitHub Secrets is the **public IP** or domain
+   - Not a private IP or `localhost`
+
+3. **Check Server Firewall**:
+   ```bash
+   # On the server
+   sudo ufw status
+   sudo ufw allow 22/tcp
+   ```
+
+4. **Alternative: Use Self-Hosted Runner**:
+   If your server is behind a firewall, consider using a GitHub Actions self-hosted runner on the server instead of SSH deployment.
 
 ### Deployment Flow
 
 1. Push to `main` branch
 2. GitHub Actions runs automatically
-3. SSH into server and runs deploy commands
-4. Services restart with new code
+3. Tests SSH connection first
+4. SSH into server and runs deploy commands
+5. Services restart with new code
 
 ## Monitoring
 
