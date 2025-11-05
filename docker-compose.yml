@@ -4,6 +4,7 @@ services:
   nginx:
     image: nginx:alpine
     container_name: makesoft_nginx
+    user: root
     ports:
       - "80:80"
       - "443:443"
@@ -22,10 +23,13 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: makesoft_cloudflared
+    user: root
     command: tunnel --config /etc/cloudflared/config.yml run
     volumes:
+      # Mount your local config
       - ./docker/cloudflared/config.yml:/etc/cloudflared/config.yml:ro
-      - ${CLOUDFLARED_CREDENTIALS_PATH:-/home/dev/.cloudflared}:/etc/cloudflared/credentials:ro
+      # Mount your local .cloudflared credentials folder
+      - /home/dev/.cloudflared:/etc/cloudflared/credentials:ro
     depends_on:
       - nginx
     restart: always
@@ -35,6 +39,7 @@ services:
   mongo:
     image: mongo:7
     container_name: makesoft_mongo
+    user: root
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-}
@@ -56,6 +61,7 @@ services:
       context: ./apps/auth
       dockerfile: Dockerfile
     container_name: makesoft_auth
+    user: root
     environment:
       - NODE_ENV=production
       - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/makesoft}
@@ -84,6 +90,7 @@ services:
       context: ./apps/api
       dockerfile: Dockerfile
     container_name: makesoft_api
+    user: root
     environment:
       - NODE_ENV=production
       - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/makesoft}
@@ -107,6 +114,7 @@ services:
       context: ./apps/forum
       dockerfile: Dockerfile
     container_name: makesoft_forum
+    user: root
     environment:
       - NODE_ENV=production
       - MONGO_URI=${MONGO_URI:-mongodb://mongo:27017/makesoft}
@@ -128,8 +136,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: makesoft_landing
-    ports:
-      - "5173:80"
+    user: root
     restart: always
     networks:
       - makesoft_network
@@ -140,8 +147,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: makesoft_portal
-    ports:
-      - "5174:80"
+    user: root
     restart: always
     networks:
       - makesoft_network

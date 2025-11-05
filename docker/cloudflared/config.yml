@@ -4,7 +4,7 @@ credentials-file: /etc/cloudflared/credentials/ef034f3f-ad26-44ec-bf16-e3131fb09
 
 ingress:
   - hostname: makesoft.io
-    service: http://nginx:80
+    service: http://landing:80
   - hostname: auth.makesoft.io
     service: http://nginx:80
   - hostname: portal.makesoft.io

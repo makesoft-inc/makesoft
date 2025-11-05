@@ -21,8 +21,8 @@ RUN npm run build
 FROM nginx:alpine AS production
 
 RUN addgroup -g 1001 -S nginx && \
-    adduser -S nginx -u 1001 -G nginx
-
+    adduser -S nginx -u 1001 -G nginx || true
+    
 COPY --from=builder --chown=nginx:nginx /app/dist /usr/share/nginx/html
 
 # Nginx configuration for SPA
